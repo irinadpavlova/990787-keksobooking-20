@@ -121,6 +121,7 @@ createMapPins(MASS_LENGTH);
 
 mapPins.appendChild(fragment);
 
+
 var mapFilter = document.querySelector('.map__filters-container');
 
 mapFilter.insertAdjacentHTML('beforebegin', '<div class="map__add"></div>');
