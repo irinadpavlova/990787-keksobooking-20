@@ -21,8 +21,10 @@ var MIN_LOCATION_Y = 130;
 var MAX_LOCATION_Y = 630;
 var OFFSET_X = 25;
 var OFFSET_Y = 70;
-
-var addObject = {};
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 87;
+var MAIN_PIN_POSITION_X = 570;
+var MAIN_PIN_POSITION_Y = 375;
 
 var getRandomInteger = function (min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -46,8 +48,17 @@ var getRandomString = function (mass) {
   return string;
 };
 
+var getCheckinCheckout = function (checkin) {
+  var checkinIndex = getRandomInteger(0, checkin.length - 2);
+  return {
+    checkoutValue: checkin[checkinIndex],
+    checkinValue: checkin[checkinIndex + 1]
+  };
+};
+
 var createObject = function (avatarsSrc, titles, minAddressX, maxAddressX, minAddressY, maxAddressY, prices, homeTypes, rooms, guests, checkin, features, descriptions, photos, minLocationX, maxLocationX, minLocationY, maxLocationY) {
-  addObject = {
+  var checkinCheckoutTmp = getCheckinCheckout(checkin);
+  var addObjectTmp = {
     author: {
       avatar: 'img/avatars/user' + getRandomMassElement(avatarsSrc) + '.png'
     },
@@ -58,8 +69,8 @@ var createObject = function (avatarsSrc, titles, minAddressX, maxAddressX, minAd
       type: getRandomString(homeTypes),
       rooms: getRandomString(rooms),
       guests: getRandomString(guests),
-      checkin: getRandomString(checkin),
-      checkout: checkin[0],
+      checkin: checkinCheckoutTmp.checkinValue,
+      checkout: checkinCheckoutTmp.checkoutValue,
       features: getRandomMass(features),
       description: getRandomMassElement(descriptions),
       photos: getRandomMass(photos)
@@ -69,31 +80,22 @@ var createObject = function (avatarsSrc, titles, minAddressX, maxAddressX, minAd
       y: getRandomInteger(minLocationY, maxLocationY)
     }
   };
-  return addObject;
+  return addObjectTmp;
 };
 
-createObject(AVATARS_SRC, TITLES, MIN_ADDRESS_X, MAX_ADDRESS_X, MIN_ADDRESS_Y, MAX_ADDRESS_Y, PRICES, HOME_TYPES, ROOMS, GUESTS, CHECKIN, FEATURES, DESCRIPTIONS, PHOTOS, MIN_LOCATION_X, MAX_LOCATION_X, MIN_LOCATION_Y, MAX_LOCATION_Y);
+// Получение массива, состоящего из 8 объявлений (объектов)
 
-var getCheckoutIndex = function (checkin) {
-  var indexCheckin = checkin.indexOf(addObject.offer.checkin);
-  if (indexCheckin === 0) {
-    var indexCheckout = indexCheckin;
-  } else {
-    indexCheckout = indexCheckin - 1;
-  }
-  var checkoutValue = checkin[indexCheckout];
-  return checkoutValue;
-};
-
-var createMass = function (massLength) {
-  var addsMass = [];
+var createAddObjects = function (massLength) {
+  var addObjectsTmp = [];
   for (var i = 0; i < massLength; i++) {
-    addObject = createObject(AVATARS_SRC, TITLES, MIN_ADDRESS_X, MAX_ADDRESS_X, MIN_ADDRESS_Y, MAX_ADDRESS_Y, PRICES, HOME_TYPES, ROOMS, GUESTS, CHECKIN, FEATURES, DESCRIPTIONS, PHOTOS, MIN_LOCATION_X, MAX_LOCATION_X, MIN_LOCATION_Y, MAX_LOCATION_Y);
-    addsMass.push(addObject);
-    addObject.offer.checkout = getCheckoutIndex(CHECKIN);
+    var addObject = createObject(AVATARS_SRC, TITLES, MIN_ADDRESS_X, MAX_ADDRESS_X, MIN_ADDRESS_Y, MAX_ADDRESS_Y, PRICES, HOME_TYPES, ROOMS, GUESTS, CHECKIN, FEATURES, DESCRIPTIONS, PHOTOS, MIN_LOCATION_X, MAX_LOCATION_X, MIN_LOCATION_Y, MAX_LOCATION_Y);
+    addObjectsTmp.push(addObject);
   }
-  return addsMass;
+  return addObjectsTmp;
 };
+var addObjects = createAddObjects(MASS_LENGTH);
+
+// Отрисовка меток объявлений на карте
 
 var mapPins = document.querySelector('.map__pins');
 
@@ -107,18 +109,20 @@ var createPin = function (object) {
   return pinElement;
 };
 
-var fragment = document.createDocumentFragment();
-
-var createMapPins = function (massLength) {
-  for (var i = 0; i < massLength; i++) {
-    fragment.appendChild(createPin(createMass(MASS_LENGTH)[i]));
+var createMapPins = function (objectsArray) {
+  var fragmentForPinsTmp = document.createDocumentFragment();
+  for (var i = 0; i < objectsArray.length; i++) {
+    fragmentForPinsTmp.appendChild(createPin(objectsArray[i]));
   }
+  return fragmentForPinsTmp;
 };
 
-createMapPins(MASS_LENGTH);
+var fragmentForPins = createMapPins(addObjects);
 
-mapPins.appendChild(fragment);
 
+//
+// // Отрисовка карточки с объявлением на карте
+//
 // var mapFilter = document.querySelector('.map__filters-container');
 //
 // mapFilter.insertAdjacentHTML('beforebegin', '<div class="map__add"></div>');
@@ -148,7 +152,7 @@ mapPins.appendChild(fragment);
 // containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--second" width="45" height="40" alt="Фотография жилья">');
 // containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--third" width="45" height="40" alt="Фотография жилья">');
 //
-// var renderAdd = function (object) {
+// var renderAddCard = function (object) {
 //   var cardElement = cardTemplate.cloneNode(true);
 //
 //   var popupTitle = cardElement.querySelector('.popup__title');
@@ -230,9 +234,12 @@ mapPins.appendChild(fragment);
 //   return cardElement;
 // };
 //
-// fragment.appendChild(renderAdd(createMass(MASS_LENGTH)[0]));
+// var fragmentForCard = document.createDocumentFragment();
+// fragmentForCard.appendChild(renderAddCard(addObjects[0]));
 //
-// mapAdd.appendChild(fragment);
+// mapAdd.appendChild(fragmentForCard);
+
+// Валидация формы
 
 var map = document.querySelector('.map');
 
@@ -242,20 +249,30 @@ var mapPinMain = document.querySelector('.map__pin--main');
 var mapFilter = document.querySelector('.map__filters');
 var filterSelects = mapFilter.querySelectorAll('select');
 var filterFieldset = mapFilter.querySelector('fieldset');
+var address = adForm.querySelector('#address');
+
+var getAddressValueFromPin = function (positionX, offsetX, positionY, offsetY) {
+  var addressValueTmp = Math.round(positionX + offsetX) + ',' + Math.round(positionY + offsetY);
+  return addressValueTmp;
+};
 
 var getDisabledPage = function () {
   for (var i = 0; i < adFieldsets.length; i++) {
     adFieldsets[i].setAttribute('disabled', 'disabled');
   }
-
+  map.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
   mapFilter.classList.add('ad-form--disabled');
 
   filterFieldset.setAttribute('disabled', 'disabled');
 
-  for (var i = 0; i < filterSelects.length; i++) {
-    filterSelects[i].setAttribute('disabled', 'disabled');
+  for (var j = 0; j < filterSelects.length; j++) {
+    filterSelects[j].setAttribute('disabled', 'disabled');
   }
+  address.value = getAddressValueFromPin(MAIN_PIN_POSITION_X, MAIN_PIN_WIDTH / 2, MAIN_PIN_POSITION_Y, MAIN_PIN_WIDTH / 2);
 };
+
+getDisabledPage();
 
 var getActivePage = function () {
   map.classList.remove('map--faded');
@@ -263,15 +280,17 @@ var getActivePage = function () {
   for (var i = 0; i < adFieldsets.length; i++) {
     adFieldsets[i].removeAttribute('disabled');
   }
-  for (var i = 0; i < filterSelects.length; i++) {
-    filterSelects[i].removeAttribute('disabled');
+  for (var j = 0; j < filterSelects.length; j++) {
+    filterSelects[j].removeAttribute('disabled');
   }
   filterFieldset.removeAttribute('disabled');
   mapFilter.classList.remove('ad-form--disabled');
+  mapPins.appendChild(fragmentForPins);
+  address.value = getAddressValueFromPin(MAIN_PIN_POSITION_X, MAIN_PIN_WIDTH / 2, MAIN_PIN_POSITION_Y, MAIN_PIN_HEIGHT);
 };
 
 mapPinMain.addEventListener('mousedown', function (evt) {
-  if (evt.button === 0 ) {
+  if (evt.button === 0) {
     getActivePage();
   }
 });
@@ -285,35 +304,52 @@ mapPinMain.addEventListener('keydown', function (evt) {
 var capacity = adForm.querySelector('#capacity');
 var roomNumber = adForm.querySelector('#room_number');
 
-roomNumber.addEventListener("change", function() {
-  var currentVal = this.value;
-  if (currentVal === "100") {
-    for (var i = 0; i < capacity.children.length; i++) {
-      capacity.children[i].disabled = true;
-    }
-    capacity.children[capacity.children.length - 1].disabled = false;
-    capacity.children[capacity.children.length - 1].selected = true;
-  } else if (currentVal === "3") {
-    for (var i = 0; i < capacity.children.length; i++) {
-      capacity.children[i].disabled = false;
-    }
-    capacity.children[capacity.children.length - 1].disabled = true;
-    capacity.children[capacity.children.length - 4].selected = true;
-  } else if (currentVal === "2") {
-    for (var i = 0; i < capacity.children.length; i++) {
-      capacity.children[i].disabled = true;
-    }
-    capacity.children[capacity.children.length - 3].disabled = false;
-    capacity.children[capacity.children.length - 2].disabled = false;
-    capacity.children[capacity.children.length - 3].selected = true;
-  } else if (currentVal === "1"){
-    for (var i = 0; i < capacity.children.length; i++) {
-      capacity.children[i].disabled = true;
-    }
-    capacity.children[capacity.children.length - 2].disabled = false;
-    capacity.children[capacity.children.length - 2].selected = true;
+capacity.addEventListener('change', function () {
+  if (capacity.value > roomNumber.value) {
+    capacity.setCustomValidity('Количество гостей превышает количество спальних мест');
+  } else {
+    capacity.setCustomValidity('');
   }
 });
+
+roomNumber.addEventListener('change', function () {
+  getCapacityFromRoomNumber(roomNumber.value);
+});
+
+var getCapacityFromRoomNumber = function (roomNumberValue) {
+  switch (roomNumberValue) {
+    case '100':
+      for (var i = 0; i < capacity.children.length; i++) {
+        capacity.children[i].disabled = true;
+      }
+      capacity.children[capacity.children.length - 1].disabled = false;
+      capacity.children[capacity.children.length - 1].selected = true;
+      break;
+    case '3':
+      for (var j = 0; j < capacity.children.length; j++) {
+        capacity.children[j].disabled = false;
+      }
+      capacity.children[capacity.children.length - 1].disabled = true;
+      capacity.children[capacity.children.length - 4].selected = true;
+      break;
+    case '2':
+      for (var k = 0; k < capacity.children.length; k++) {
+        capacity.children[k].disabled = true;
+      }
+      capacity.children[capacity.children.length - 3].disabled = false;
+      capacity.children[capacity.children.length - 2].disabled = false;
+      capacity.children[capacity.children.length - 3].selected = true;
+      break;
+    case '1':
+      for (var n = 0; n < capacity.children.length; n++) {
+        capacity.children[n].disabled = true;
+      }
+      capacity.children[capacity.children.length - 2].disabled = false;
+      capacity.children[capacity.children.length - 2].selected = true;
+      break;
+  }
+  return roomNumberValue;
+};
 
 var price = adForm.querySelector('#price');
 var type = adForm.querySelector('#type');
@@ -347,27 +383,31 @@ type.addEventListener('change', function () {
 var timein = adForm.querySelector('#timein');
 var timeout = adForm.querySelector('#timeout');
 
-var getTimeoutFromTimein = function (timein) {
-  switch (timein) {
+var synchronizeTimeinTimeout = function (timeinTimeoutValue, timeinTimeout) {
+  switch (timeinTimeoutValue) {
     case '12:00':
-      timeout.children[1].disabled = true;
-      timeout.children[2].disabled = true;
-      timeout.children[0].selected = true;
+      timeinTimeout.children[1].disabled = true;
+      timeinTimeout.children[2].disabled = true;
+      timeinTimeout.children[0].selected = true;
       break;
     case '13:00':
-      timeout.children[0].disabled = true;
-      timeout.children[2].disabled = true;
-      timeout.children[1].selected = true;
+      timeinTimeout.children[0].disabled = true;
+      timeinTimeout.children[2].disabled = true;
+      timeinTimeout.children[1].selected = true;
       break;
     case '14:00':
-      timeout.children[0].disabled = true;
-      timeout.children[1].disabled = true;
-      timeout.children[2].selected = true;
+      timeinTimeout.children[0].disabled = true;
+      timeinTimeout.children[1].disabled = true;
+      timeinTimeout.children[2].selected = true;
       break;
   }
-  return timein;
+  return timeinTimeoutValue;
 };
 
 timein.addEventListener('change', function () {
-  getTimeoutFromTimein(timein.value);
+  synchronizeTimeinTimeout(timein.value, timeout);
+});
+
+timeout.addEventListener('change', function () {
+  synchronizeTimeinTimeout(timeout.value, timein);
 });
