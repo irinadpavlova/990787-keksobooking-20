@@ -313,6 +313,12 @@ capacity.addEventListener('change', function () {
 });
 
 roomNumber.addEventListener('change', function () {
+  if (roomNumber.value <= capacity.value) {
+    capacity.setCustomValidity('');
+  }
+});
+
+roomNumber.addEventListener('change', function () {
   getCapacityFromRoomNumber(roomNumber.value);
 });
 
@@ -383,31 +389,10 @@ type.addEventListener('change', function () {
 var timein = adForm.querySelector('#timein');
 var timeout = adForm.querySelector('#timeout');
 
-var synchronizeTimeinTimeout = function (timeinTimeoutValue, timeinTimeout) {
-  switch (timeinTimeoutValue) {
-    case '12:00':
-      timeinTimeout.children[1].disabled = true;
-      timeinTimeout.children[2].disabled = true;
-      timeinTimeout.children[0].selected = true;
-      break;
-    case '13:00':
-      timeinTimeout.children[0].disabled = true;
-      timeinTimeout.children[2].disabled = true;
-      timeinTimeout.children[1].selected = true;
-      break;
-    case '14:00':
-      timeinTimeout.children[0].disabled = true;
-      timeinTimeout.children[1].disabled = true;
-      timeinTimeout.children[2].selected = true;
-      break;
-  }
-  return timeinTimeoutValue;
-};
-
 timein.addEventListener('change', function () {
-  synchronizeTimeinTimeout(timein.value, timeout);
+  timeout.value = timein.value;
 });
 
 timeout.addEventListener('change', function () {
-  synchronizeTimeinTimeout(timeout.value, timein);
+  timein.value = timeout.value;
 });
