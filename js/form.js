@@ -3,6 +3,12 @@
 (function () {
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 87;
+  var MAIN_PIN_MIN_X = 0;
+  var MAIN_PIN_MAX_X = 1200;
+  var MAIN_PIN_MIN_Y = 130;
+  var MAIN_PIN_MAX_Y = 710;
+  var MAIN_PIN_MAX_ADDRESS_Y = 630;
+
   var map = document.querySelector('.map');
   var mapPins = document.querySelector('.map__pins');
   var mapFilter = document.querySelector('.map__filters-container');
@@ -196,14 +202,17 @@
       };
       var pinPositionX = mapPinMain.offsetLeft - shift.x;
       var pinPositionY = mapPinMain.offsetTop - shift.y;
-      var addressValueX = Math.round(pinPositionX + MAIN_PIN_WIDTH / 2);
-      var addressValueY = Math.round(pinPositionY + MAIN_PIN_HEIGHT);
 
-      if (addressValueX >= 0 && addressValueX <= 1200 && addressValueY >= 130 && addressValueY <= 630) {
+      var pinEndCoordX = Math.round(pinPositionX + MAIN_PIN_WIDTH / 2);
+      var pinEndCoordY = Math.round(pinPositionY + MAIN_PIN_HEIGHT);
 
-        address.value = addressValueX + ',' + addressValueY;
+      if (pinEndCoordX >= MAIN_PIN_MIN_X && pinEndCoordX <= MAIN_PIN_MAX_X && pinEndCoordY >= MAIN_PIN_MIN_Y && pinEndCoordY <= MAIN_PIN_MAX_Y) {
         mapPinMain.style.top = pinPositionY + 'px';
         mapPinMain.style.left = pinPositionX + 'px';
+        if (pinEndCoordY >= MAIN_PIN_MAX_ADDRESS_Y) {
+          pinEndCoordY = MAIN_PIN_MAX_ADDRESS_Y;
+        }
+        address.value = pinEndCoordX + ',' + pinEndCoordY;
       }
     };
 
