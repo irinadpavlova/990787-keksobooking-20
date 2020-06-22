@@ -7,24 +7,6 @@
 
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 
-  var getHomeType = function (homeType) {
-    switch (homeType) {
-      case 'palace':
-        homeType = 'Дворец';
-        break;
-      case 'bungalo':
-        homeType = 'Бунгало';
-        break;
-      case 'house':
-        homeType = 'Дом';
-        break;
-      case 'flat':
-        homeType = 'Квартира';
-        break;
-    }
-    return homeType;
-  };
-
   var containerPhotos = document.querySelector('#card').content.querySelector('.popup__photos');
   containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--second" width="45" height="40" alt="Фотография жилья">');
   containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--third" width="45" height="40" alt="Фотография жилья">');
@@ -52,7 +34,7 @@
       }
 
       var popupType = cardElement.querySelector('.popup__type');
-      popupType.textContent = getHomeType(object.offer.type);
+      popupType.textContent = object.offer.type;
       if (!object.offer.type) {
         popupType.remove();
       }
