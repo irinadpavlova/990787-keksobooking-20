@@ -3,6 +3,8 @@
 (function () {
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 87;
+  var MAIN_PIN_START_X = 570;
+  var MAIN_PIN_START_Y = 375;
   var MAIN_PIN_MIN_X = 0;
   var MAIN_PIN_MAX_X = 1200;
   var MAIN_PIN_MIN_Y = 130;
@@ -65,7 +67,13 @@
     for (var j = 0; j < filterSelects.length; j++) {
       filterSelects[j].setAttribute('disabled', 'disabled');
     }
-    address.value = getAddressValueFromPin(mapPinMain.offsetLeft, MAIN_PIN_WIDTH, mapPinMain.offsetTop, MAIN_PIN_WIDTH);
+    address.value = getAddressValueFromPin(MAIN_PIN_START_X, MAIN_PIN_WIDTH, MAIN_PIN_START_Y, MAIN_PIN_WIDTH);
+    var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    if (mapPinsElements) {
+      for (var k = 0; k < mapPinsElements.length; k++) {
+        mapPinsElements[k].remove();
+      }
+    }
   };
 
   getDisabledPage();
@@ -255,5 +263,116 @@
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  });
+
+  // Отправка формы, сообщения
+
+  var resetButton = document.querySelector('.ad-form__reset');
+
+  resetButton.addEventListener('click', function () {
+    adForm.reset();
+    getDisabledPage();
+  });
+
+  resetButton.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      adForm.reset();
+      getDisabledPage();
+    }
+  });
+
+  var renderSuccessPopup = function () {
+    var mainContent = document.querySelector('main');
+    var successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
+
+    var successMessage = successMessageTemplate.cloneNode(true);
+    mainContent.appendChild(successMessage);
+  };
+
+  var onSuccessPopupEscPress = function (evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      var popup = document.querySelector('.success');
+      popup.remove();
+    }
+  };
+
+  var onOutsideOfSuccessPopupClick = function (evt) {
+    var successPopup = document.querySelector('.success');
+    var targetMessage = evt.target.closest('.success__message');
+    if (!targetMessage) {
+      successPopup.remove();
+    }
+  };
+
+  var openSuccessPopup = function () {
+    renderSuccessPopup();
+
+    document.addEventListener('click', onOutsideOfSuccessPopupClick);
+
+    document.addEventListener('keydown', onSuccessPopupEscPress);
+  };
+
+  var closeSuccessPopup = function () {
+    var successPopup = document.querySelector('.success');
+    if (!successPopup) {
+      document.removeEventListener('click', onOutsideOfSuccessPopupClick);
+
+      document.removeEventListener('keydown', onSuccessPopupEscPress);
+    }
+  };
+
+  var renderErrorPopup = function () {
+    var mainContent = document.querySelector('main');
+    var errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
+
+    var errorMessage = errorMessageTemplate.cloneNode(true);
+    mainContent.appendChild(errorMessage);
+  };
+
+  var onErrorPopupEscPress = function (evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      var popup = document.querySelector('.error');
+      popup.remove();
+    }
+  };
+
+  var onOutsideOfErrorPopupClick = function (evt) {
+    var errorPopup = document.querySelector('.error');
+    var targetMessage = evt.target.closest('.error__message');
+    if (!targetMessage) {
+      errorPopup.remove();
+    }
+  };
+
+  var openErrorPopup = function () {
+    renderErrorPopup();
+
+    document.addEventListener('click', onOutsideOfErrorPopupClick);
+
+    document.addEventListener('keydown', onErrorPopupEscPress);
+  };
+
+  var closeErrorPopup = function () {
+    var errorPopup = document.querySelector('.error');
+    if (!errorPopup) {
+      document.removeEventListener('click', onOutsideOfErrorPopupClick);
+
+      document.removeEventListener('keydown', onErrorPopupEscPress);
+    }
+  };
+
+  adForm.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(adForm), function () {
+      adForm.reset();
+      getDisabledPage();
+      openSuccessPopup();
+      closeSuccessPopup();
+    }, function () {
+      openErrorPopup();
+      closeErrorPopup();
+    });
+    evt.preventDefault();
   });
 })();
