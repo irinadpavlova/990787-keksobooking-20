@@ -22,6 +22,7 @@
     minLocationY: MIN_LOCATION_Y,
     maxLocationY: MAX_LOCATION_Y,
     offsetX: OFFSET_X,
-    offsetY: OFFSET_Y
+    offsetY: OFFSET_Y,
+    cards: []
   };
 })();

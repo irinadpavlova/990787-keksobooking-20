@@ -89,7 +89,6 @@
       if (!object.author.avatar) {
         popupAvatar.remove();
       }
-
       return cardElement;
     }
   };
