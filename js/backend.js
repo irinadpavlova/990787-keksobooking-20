@@ -35,6 +35,7 @@
       xhr.addEventListener('load', function () {
         if (xhr.status === StatusCode.OK) {
           onLoad(xhr.response);
+          // onLoad(xhr.response, window.form.callback);
         } else {
           onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
         }
