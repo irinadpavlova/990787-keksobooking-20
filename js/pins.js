@@ -2,6 +2,7 @@
 
 (function () {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+  var mapPins = document.querySelector('.map__pins');
 
   window.pins = {
     createPin: function (object) {
@@ -11,6 +12,14 @@
       pinElement.querySelector('img').alt = object.offer.title;
       pinElement.setAttribute('data-index', object.id);
       return pinElement;
+    },
+    renderPins: function (object) {
+      var fragmentForPinsTmp = document.createDocumentFragment();
+      object.forEach(function (element) {
+        fragmentForPinsTmp.appendChild(window.pins.createPin(element));
+      });
+      mapPins.appendChild(fragmentForPinsTmp);
     }
   };
+
 })();
