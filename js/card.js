@@ -25,6 +25,8 @@
       case 'flat':
         homeType = 'Квартира';
         break;
+      default:
+        homeType = 'Тип жилья указан не корректно';
     }
     return homeType;
   };

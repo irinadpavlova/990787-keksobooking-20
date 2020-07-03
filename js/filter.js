@@ -20,11 +20,11 @@
 
   var middlePrice = {
     from: 10000,
-    to: 49999,
+    to: 50000,
   };
 
   var highPrice = {
-    from: 50000,
+    from: 50001,
     to: 10000000,
   };
 
@@ -33,7 +33,7 @@
   };
 
   var filterHousingPrice = function (advert) {
-    return housingPrice.value === DEFAULT_VALUE || housingPrice.value === 'low' && advert.offer.price < lowPrice.to || housingPrice.value === 'middle' && advert.offer.price >= middlePrice.from && advert.offer.price <= middlePrice.to || housingPrice.value === 'high' && advert.offer.price > highPrice.from;
+    return housingPrice.value === DEFAULT_VALUE || housingPrice.value === 'low' && advert.offer.price <= lowPrice.to || housingPrice.value === 'middle' && advert.offer.price >= middlePrice.from && advert.offer.price <= middlePrice.to || housingPrice.value === 'high' && advert.offer.price >= highPrice.from;
   };
 
   var filterHousingRooms = function (advert) {

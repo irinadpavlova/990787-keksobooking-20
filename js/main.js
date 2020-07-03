@@ -16,14 +16,32 @@
   var adForm = document.querySelector('.ad-form');
   var adFieldsets = adForm.querySelectorAll('fieldset');
   var mapPinMain = document.querySelector('.map__pin--main');
-  var filterSelects = mapFilter.querySelectorAll('select');
-  var filterFieldset = mapFilter.querySelector('fieldset');
   var address = adForm.querySelector('#address');
 
   var getAddressValueFromPin = function (positionX, pinWidth, positionY, pinHeight) {
     var addressValueTmp = Math.round(positionX + pinWidth / 2) + ',' + Math.round(positionY + pinHeight / 2);
     return addressValueTmp;
   };
+
+  var getDisabledPage = function () {
+    for (var i = 0; i < adFieldsets.length; i++) {
+      adFieldsets[i].setAttribute('disabled', 'disabled');
+    }
+    map.classList.add('map--faded');
+    adForm.classList.add('ad-form--disabled');
+    mapFilter.classList.add('ad-form--disabled');
+    window.filter.setDisabled();
+
+    address.value = getAddressValueFromPin(MAIN_PIN_START_X, MAIN_PIN_WIDTH, MAIN_PIN_START_Y, MAIN_PIN_WIDTH);
+    var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    if (mapPinsElements) {
+      for (var k = 0; k < mapPinsElements.length; k++) {
+        mapPinsElements[k].remove();
+      }
+    }
+  };
+
+  getDisabledPage();
 
   var successHandler = function (data) {
     getCardsArrayWithId(data);
@@ -51,30 +69,6 @@
     node.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
   };
-
-  var getDisabledPage = function () {
-    for (var i = 0; i < adFieldsets.length; i++) {
-      adFieldsets[i].setAttribute('disabled', 'disabled');
-    }
-    map.classList.add('map--faded');
-    adForm.classList.add('ad-form--disabled');
-    mapFilter.classList.add('ad-form--disabled');
-
-    filterFieldset.setAttribute('disabled', 'disabled');
-
-    for (var j = 0; j < filterSelects.length; j++) {
-      filterSelects[j].setAttribute('disabled', 'disabled');
-    }
-    address.value = getAddressValueFromPin(MAIN_PIN_START_X, MAIN_PIN_WIDTH, MAIN_PIN_START_Y, MAIN_PIN_WIDTH);
-    var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    if (mapPinsElements) {
-      for (var k = 0; k < mapPinsElements.length; k++) {
-        mapPinsElements[k].remove();
-      }
-    }
-  };
-
-  getDisabledPage();
 
   var getActivePage = function () {
     map.classList.remove('map--faded');

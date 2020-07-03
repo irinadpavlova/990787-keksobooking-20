@@ -202,6 +202,7 @@
     window.backend.save(new FormData(adForm), function () {
       adForm.reset();
       window.main.getDisabledPage();
+      window.filter.setDisabled();
       openSuccessPopup();
       closeSuccessPopup();
     }, function () {
