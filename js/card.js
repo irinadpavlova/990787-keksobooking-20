@@ -11,6 +11,26 @@
   containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--second" width="45" height="40" alt="Фотография жилья">');
   containerPhotos.insertAdjacentHTML('beforeend', '<img src="" class="popup__photo popup__photo--third" width="45" height="40" alt="Фотография жилья">');
 
+  var getHomeType = function (homeType) {
+    switch (homeType) {
+      case 'palace':
+        homeType = 'Дворец';
+        break;
+      case 'bungalo':
+        homeType = 'Бунгало';
+        break;
+      case 'house':
+        homeType = 'Дом';
+        break;
+      case 'flat':
+        homeType = 'Квартира';
+        break;
+      default:
+        homeType = 'Тип жилья указан не корректно';
+    }
+    return homeType;
+  };
+
   window.card = {
     createAddCard: function (object) {
       var cardElement = cardTemplate.cloneNode(true);
@@ -34,7 +54,7 @@
       }
 
       var popupType = cardElement.querySelector('.popup__type');
-      popupType.textContent = object.offer.type;
+      popupType.textContent = getHomeType(object.offer.type);
       if (!object.offer.type) {
         popupType.remove();
       }
@@ -52,12 +72,36 @@
       }
 
       var featuresContainer = cardElement.querySelector('.popup__features');
+      var featureConditioner = cardElement.querySelector('.popup__feature--conditioner');
+      var featureElevator = cardElement.querySelector('.popup__feature--elevator');
+      var featureWasher = cardElement.querySelector('.popup__feature--washer');
+      var featureParking = cardElement.querySelector('.popup__feature--parking');
+      var featureDishwasher = cardElement.querySelector('.popup__feature--dishwasher');
+      var featureWifi = cardElement.querySelector('.popup__feature--wifi');
 
-      var features = cardElement.querySelectorAll('.popup__feature');
-      for (var i = 0; i < features.length; i++) {
-        if (object.offer.features[i] === undefined) {
-          features[i].remove();
-        }
+      if (object.offer.features.indexOf('wifi') < 0) {
+        featureWifi.remove();
+      }
+
+      if (object.offer.features.indexOf('dishwasher') < 0) {
+        featureDishwasher.remove();
+      }
+
+      if (object.offer.features.indexOf('parking') < 0) {
+        featureParking.remove();
+      }
+
+      if (object.offer.features.indexOf('washer') < 0) {
+        featureWasher.remove();
+      }
+
+      if (object.offer.features.indexOf('elevator') < 0) {
+        featureElevator.remove();
+      }
+
+      if (object.offer.features.indexOf('conditioner') < 0) {
+
+        featureConditioner.remove();
       }
 
       if (!object.offer.features) {

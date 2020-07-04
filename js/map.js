@@ -28,9 +28,9 @@
   };
 
   var onPopupEscPress = function (evt) {
-    if (evt.key === 'Escape') {
+    var mapCard = map.querySelector('.map__card');
+    if (evt.key === 'Escape' && mapCard) {
       evt.preventDefault();
-      var mapCard = map.querySelector('.map__card');
       mapCard.remove();
       removeActivePinClass();
     }
