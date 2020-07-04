@@ -13,6 +13,7 @@
 
   var map = document.querySelector('.map');
   var mapFilter = document.querySelector('.map__filters-container');
+  var filterForm = document.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
   var adFieldsets = adForm.querySelectorAll('fieldset');
   var mapPinMain = document.querySelector('.map__pin--main');
@@ -23,6 +24,24 @@
     return addressValueTmp;
   };
 
+  var removeMapPins = function () {
+    var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    if (mapPinsElements) {
+      for (var i = 0; i < mapPinsElements.length; i++) {
+        mapPinsElements[i].remove();
+      }
+    }
+  };
+
+  var removeCard = function () {
+    var mapCards = map.querySelectorAll('.map__card');
+    if (mapCards) {
+      for (var i = 0; i < mapCards.length; i++) {
+        mapCards[i].remove();
+      }
+    }
+  };
+
   var getDisabledPage = function () {
     for (var i = 0; i < adFieldsets.length; i++) {
       adFieldsets[i].setAttribute('disabled', 'disabled');
@@ -31,14 +50,15 @@
     adForm.classList.add('ad-form--disabled');
     mapFilter.classList.add('ad-form--disabled');
     window.filter.setDisabled();
-
+    removeMapPins();
+    removeCard();
     address.value = getAddressValueFromPin(MAIN_PIN_START_X, MAIN_PIN_WIDTH, MAIN_PIN_START_Y, MAIN_PIN_WIDTH);
-    var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    if (mapPinsElements) {
-      for (var k = 0; k < mapPinsElements.length; k++) {
-        mapPinsElements[k].remove();
-      }
-    }
+    mapPinMain.style.top = MAIN_PIN_START_Y + 'px';
+    mapPinMain.style.left = MAIN_PIN_START_X + 'px';
+  };
+
+  var resetFilters = function () {
+    filterForm.reset();
   };
 
   getDisabledPage();
@@ -46,6 +66,9 @@
   var successHandler = function (data) {
     getCardsArrayWithId(data);
     window.filter.setEnabled();
+    removeMapPins();
+    removeCard();
+    resetFilters();
     window.pins.renderPins(window.data.cards.slice(0, 5));
     window.map.init();
   };
@@ -53,7 +76,9 @@
   var getCardsArrayWithId = function (data) {
     data.forEach(function (element, index) {
       element.id = index;
-      window.data.cards.push(element);
+      if (element.offer) {
+        window.data.cards.push(element);
+      }
     });
     return window.data.cards;
   };

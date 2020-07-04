@@ -30,7 +30,9 @@
   window.room = {
     resetImage: function () {
       var roomImage = roomPhotoContainer.querySelector('.room-photo');
-      roomImage.remove();
+      if (roomImage) {
+        roomImage.remove();
+      }
     }
   };
 
