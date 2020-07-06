@@ -13,9 +13,9 @@
       pinElement.setAttribute('data-index', object.id);
       return pinElement;
     },
-    renderPins: function (object) {
+    render: function (cards) {
       var fragmentForPinsTmp = document.createDocumentFragment();
-      object.forEach(function (element) {
+      cards.forEach(function (element) {
         fragmentForPinsTmp.appendChild(window.pins.createPin(element));
       });
       mapPins.appendChild(fragmentForPinsTmp);

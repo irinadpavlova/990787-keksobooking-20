@@ -26,25 +26,25 @@
   var removeMapPins = function () {
     var mapPinsElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
     if (mapPinsElements) {
-      for (var i = 0; i < mapPinsElements.length; i++) {
-        mapPinsElements[i].remove();
-      }
+      mapPinsElements.forEach(function (it) {
+        it.remove();
+      });
     }
   };
 
   var removeCard = function () {
     var mapCards = map.querySelectorAll('.map__card');
     if (mapCards) {
-      for (var i = 0; i < mapCards.length; i++) {
-        mapCards[i].remove();
-      }
+      mapCards.forEach(function (it) {
+        it.remove();
+      });
     }
   };
 
   var getDisabledPage = function () {
-    for (var i = 0; i < adFieldsets.length; i++) {
-      adFieldsets[i].setAttribute('disabled', 'disabled');
-    }
+    adFieldsets.forEach(function (it) {
+      it.setAttribute('disabled', 'disabled');
+    });
     map.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
     mapFilter.classList.add('ad-form--disabled');
@@ -54,6 +54,7 @@
     address.value = getAddressValueFromPin(MAIN_PIN_START_X, MAIN_PIN_WIDTH, MAIN_PIN_START_Y, MAIN_PIN_WIDTH);
     mapPinMain.style.top = MAIN_PIN_START_Y + 'px';
     mapPinMain.style.left = MAIN_PIN_START_X + 'px';
+    window.map.uninit();
   };
 
   getDisabledPage();
@@ -61,7 +62,7 @@
   var successHandler = function (data) {
     getCardsArrayWithId(data);
     window.filter.setEnabled();
-    window.pins.renderPins(window.data.cards.slice(0, 5));
+    window.pins.render(window.data.cards.slice(0, 5));
     window.map.init();
   };
 
@@ -90,9 +91,9 @@
   var getActivePage = function () {
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    for (var i = 0; i < adFieldsets.length; i++) {
-      adFieldsets[i].removeAttribute('disabled');
-    }
+    adFieldsets.forEach(function (it) {
+      it.removeAttribute('disabled', 'disabled');
+    });
     mapFilter.classList.remove('ad-form--disabled');
   };
 

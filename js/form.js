@@ -26,31 +26,31 @@
   var getCapacityFromRoomNumber = function (roomNumberValue) {
     switch (roomNumberValue) {
       case '100':
-        for (var i = 0; i < capacity.children.length; i++) {
-          capacity.children[i].disabled = true;
-        }
+        [].forEach.call(capacity.children, function (it) {
+          it.disabled = true;
+        });
         capacity.children[capacity.children.length - 1].disabled = false;
         capacity.children[capacity.children.length - 1].selected = true;
         break;
       case '3':
-        for (var j = 0; j < capacity.children.length; j++) {
-          capacity.children[j].disabled = false;
-        }
+        [].forEach.call(capacity.children, function (it) {
+          it.disabled = false;
+        });
         capacity.children[capacity.children.length - 1].disabled = true;
         capacity.children[capacity.children.length - 4].selected = true;
         break;
       case '2':
-        for (var k = 0; k < capacity.children.length; k++) {
-          capacity.children[k].disabled = true;
-        }
+        [].forEach.call(capacity.children, function (it) {
+          it.disabled = true;
+        });
         capacity.children[capacity.children.length - 3].disabled = false;
         capacity.children[capacity.children.length - 2].disabled = false;
         capacity.children[capacity.children.length - 3].selected = true;
         break;
       case '1':
-        for (var n = 0; n < capacity.children.length; n++) {
-          capacity.children[n].disabled = true;
-        }
+        [].forEach.call(capacity.children, function (it) {
+          it.disabled = true;
+        });
         capacity.children[capacity.children.length - 2].disabled = false;
         capacity.children[capacity.children.length - 2].selected = true;
         break;
@@ -129,6 +129,7 @@
       evt.preventDefault();
       var popup = document.querySelector('.success');
       popup.remove();
+      closeSuccessPopup();
     }
   };
 
@@ -137,6 +138,7 @@
     var targetMessage = evt.target.closest('.success__message');
     if (!targetMessage) {
       successPopup.remove();
+      closeSuccessPopup();
     }
   };
 
@@ -149,12 +151,9 @@
   };
 
   var closeSuccessPopup = function () {
-    var successPopup = document.querySelector('.success');
-    if (!successPopup) {
-      document.removeEventListener('click', onOutsideOfSuccessPopupClick);
+    document.removeEventListener('click', onOutsideOfSuccessPopupClick);
 
-      document.removeEventListener('keydown', onSuccessPopupEscPress);
-    }
+    document.removeEventListener('keydown', onSuccessPopupEscPress);
   };
 
   var renderErrorPopup = function () {
@@ -170,6 +169,7 @@
       evt.preventDefault();
       var popup = document.querySelector('.error');
       popup.remove();
+      closeErrorPopup();
     }
   };
 
@@ -178,6 +178,7 @@
     var targetMessage = evt.target.closest('.error__message');
     if (!targetMessage) {
       errorPopup.remove();
+      closeErrorPopup();
     }
   };
 
@@ -190,24 +191,19 @@
   };
 
   var closeErrorPopup = function () {
-    var errorPopup = document.querySelector('.error');
-    if (!errorPopup) {
-      document.removeEventListener('click', onOutsideOfErrorPopupClick);
+    document.removeEventListener('click', onOutsideOfErrorPopupClick);
 
-      document.removeEventListener('keydown', onErrorPopupEscPress);
-    }
+    document.removeEventListener('keydown', onErrorPopupEscPress);
   };
 
   adForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(adForm), function () {
       adForm.reset();
+      window.data.cards = [];
       window.main.getDisabledPage();
-      window.filter.setDisabled();
       openSuccessPopup();
-      closeSuccessPopup();
     }, function () {
       openErrorPopup();
-      closeErrorPopup();
     });
     evt.preventDefault();
   });

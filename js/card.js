@@ -32,7 +32,7 @@
   };
 
   window.card = {
-    createAddCard: function (object) {
+    createAdvert: function (object) {
       var cardElement = cardTemplate.cloneNode(true);
 
       var popupTitle = cardElement.querySelector('.popup__title');
@@ -100,7 +100,6 @@
       }
 
       if (object.offer.features.indexOf('conditioner') < 0) {
-
         featureConditioner.remove();
       }
 
@@ -116,13 +115,13 @@
 
       var photosContainer = cardElement.querySelector('.popup__photos');
       var photos = cardElement.querySelectorAll('.popup__photo');
-      for (var p = 0; p < photos.length; p++) {
+      photos.forEach(function (it, p) {
         if (object.offer.photos[p]) {
-          photos[p].src = object.offer.photos[p];
+          it.src = object.offer.photos[p];
         } else {
-          photos[p].remove();
+          it.remove();
         }
-      }
+      });
 
       if (!object.offer.photos) {
         photosContainer.remove();

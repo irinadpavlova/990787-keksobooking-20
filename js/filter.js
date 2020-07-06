@@ -59,11 +59,11 @@
 
   var removePins = function () {
     var mapPinsElements = document.querySelectorAll('.map__pin');
-    for (var i = 0; i < mapPinsElements.length; i++) {
-      if (!mapPinsElements[i].matches('.map__pin--main')) {
-        mapPinsElements[i].remove();
+    mapPinsElements.forEach(function (it) {
+      if (!it.matches('.map__pin--main')) {
+        it.remove();
       }
-    }
+    });
   };
 
   var setFiltersToAdverts = function () {
@@ -87,7 +87,8 @@
         break;
       }
     }
-    window.pins.renderPins(adverts);
+
+    window.pins.render(adverts);
   };
 
   var onFilterChange = function () {
